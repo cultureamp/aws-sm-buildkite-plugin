@@ -22,7 +22,7 @@ function get_secret_value() {
   secrets=$(aws secretsmanager get-secret-value \
       --secret-id "${secretId}" \
       --version-stage AWSCURRENT \
-      $regionFlag \
+      "${regionFlag}" \
       --output json \
       --query '{SecretString: SecretString, SecretBinary: SecretBinary}')
 
@@ -33,7 +33,7 @@ function get_secret_value() {
   fi
 
   # if the secret binary field has a value, assume it's a binary
-  local secretBinary=$(echo "${secrets}" | jq -r '.SecretBinary | select(. != null)')
+  local secretBinary; secretBinary=$(echo "${secrets}" | jq -r '.SecretBinary | select(. != null)')
   if [[ -n "${secretBinary}" ]]; then
     # don't read binary in cases where it's not allowed
     if [[ "${allowBinary}" == "allow-binary" ]]; then
